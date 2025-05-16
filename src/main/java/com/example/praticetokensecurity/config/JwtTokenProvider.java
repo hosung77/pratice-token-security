@@ -1,5 +1,7 @@
 package com.example.praticetokensecurity.config;
 
+import com.example.praticetokensecurity.common.exception.CustomException;
+import com.example.praticetokensecurity.common.exception.ErrorCode;
 import com.example.praticetokensecurity.user.entity.User;
 import com.example.praticetokensecurity.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
@@ -66,7 +68,7 @@ public class JwtTokenProvider {
         if(StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)){
             return tokenValue.substring(7);
         }
-        throw new RuntimeException("Not Found Token");
+        throw new CustomException(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     public Claims extractClaims(String token){
