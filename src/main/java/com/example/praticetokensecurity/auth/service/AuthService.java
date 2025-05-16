@@ -2,6 +2,8 @@ package com.example.praticetokensecurity.auth.service;
 
 import com.example.praticetokensecurity.auth.dto.response.SignInResponseDto;
 import com.example.praticetokensecurity.auth.dto.response.SignUpResponseDto;
+import com.example.praticetokensecurity.common.exception.CustomException;
+import com.example.praticetokensecurity.common.exception.ErrorCode;
 import com.example.praticetokensecurity.config.JwtTokenProvider;
 import com.example.praticetokensecurity.token.entity.RefreshToken;
 import com.example.praticetokensecurity.token.repository.RefreshTokenRepository;
@@ -28,7 +30,7 @@ public class AuthService {
     public SignUpResponseDto signUp(String email, String password, String Role) {
 
         if (userRepository.existsByEmail(email)){
-            throw new RuntimeException("존재유저"); // 임시 에러처리
+            throw new CustomException(ErrorCode.AlREADY_EXIST_UESR); // 임시 에러처리
         }
 
         UserRole userRole = UserRole.of(Role);
@@ -43,10 +45,10 @@ public class AuthService {
     public SignInResponseDto signIn(@Valid String email, @Valid String password) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않은 유저"));
+                .orElseThrow(() -> new CustomException(ErrorCode.EMAIL_NOT_FOUND));
 
         if(!passwordEncoder.matches(password, user.getPassword())){
-            new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(user);
